@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -39,17 +40,18 @@ public class SecurityConfig {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
-                // Настройка доступа к конечным точкам
                 .authorizeHttpRequests(request -> request
-                        // * - 1 уровень вложенности,  - любое количество уровней вложенности
-                        .requestMatchers("/user/get-admin").hasRole("ADMIN") // Доступ только для ADMIN
-//                      .requestMatchers("/user/**").authenticated() // Доступ для аутентифицированных пользователей
+                        .requestMatchers( "/h2-console/").permitAll()
+                        .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .headers(httpSecurityHeadersConfigurer -> {
                     httpSecurityHeadersConfigurer.
                             frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
-                });
+                })
+                .httpBasic(withDefaults());
+
         return http.build();
     }
 
