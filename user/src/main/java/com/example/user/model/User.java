@@ -1,32 +1,26 @@
 package com.example.user.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
-    @SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "firstname", nullable = false)
-    private String firstname;
-    @Column(name = "surname", nullable = false)
-    private String surname;
-    @Column(name = "lastname")
-    private String lastname;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Role role;
-    @Column(name = "login", unique = true, nullable = false)
-    private String username;
-    @Column(name = "password", nullable = false)
+
+    private String lastName;
+    private String firstName;
+    private String middleName;
+    private String login;
+    private String role;
     private String password;
+
 }

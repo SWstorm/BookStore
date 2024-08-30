@@ -1,42 +1,62 @@
 package com.example.user.controller;
 
 import com.example.user.model.User;
+import com.example.user.repositroty.UserRepository;
 import com.example.user.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/user")
-@RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
-    private final UserService service;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = service.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-    @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        User updatedUser = service.updateUser(id, userDetails);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        service.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-    @GetMapping("/{username}")
-    public User getByUsername(@PathVariable String username) {
-        return service.getByUsername(username);
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private  UserRepository userRepository;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/get-admin")
-    public void getAdmin() {
-        service.getAdmin();
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        user.setRole("ROLE_USER");
+        return userService.createUser(user);
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<User> getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @GetMapping("/{id}/exists")
+    public Boolean userExists(@PathVariable Long id) {
+        return userRepository.existsById(id);
+    }
+
+    @GetMapping("/{userId}/username")
+    public String getUsername(@PathVariable Long userId) {
+        Optional<User> user = userService.getUserById(userId);
+        return user.map(User::getLogin).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
+        return userService.updateUser(id, userDetails);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 }
