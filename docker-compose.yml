@@ -1,0 +1,63 @@
+services:
+  eureka-server:
+    image: eureka-server
+    build:
+      context: ./eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - my-network
+    volumes:
+      - db-data:/data
+
+  user-service:
+    image: user-service
+    build:
+      context: ./user
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/data/testdb;AUTO_SERVER=TRUE
+    networks:
+      - my-network
+    volumes:
+      - db-data:/data
+    depends_on:
+      - eureka-server
+
+  book-service:
+    image: book-service
+    build:
+      context: ./book
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/data/testdb;AUTO_SERVER=TRUE
+    networks:
+      - my-network
+    volumes:
+      - db-data:/data
+    depends_on:
+      - eureka-server
+
+  order-service:
+    image: order-service
+    build:
+      context: ./order
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/data/testdb;AUTO_SERVER=TRUE
+    networks:
+      - my-network
+    volumes:
+      - db-data:/data
+    depends_on:
+      - eureka-server
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  db-data:
